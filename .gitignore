@@ -1,0 +1,10 @@
+__pycache__/
+*.pkl
+*.csv
+.env
+metrics.txt
+.DS_Store
+venv/
+.idea/
+.vscode/
+venv/

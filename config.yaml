@@ -1,0 +1,25 @@
+project:
+  name: "tourism_project"
+  hf_username: "RavikanthAI9"
+
+data:
+  raw_file: "data/tourism.csv"
+  dataset_name: "tourism-raw"
+  processed_dataset_name: "tourism-processed"
+  target_column: "ProdTaken"
+  test_size: 0.2
+  random_state: 42
+
+model:
+  model_name: "tourism-model"
+  filename: "model.pkl"
+  columns_filename: "model_columns.pkl"
+  type: "RandomForest"
+  params:
+    n_estimators: 100
+    max_depth: 10
+    random_state: 42
+
+deployment:
+  app_name: "tourism_project"
+  port: 7860
