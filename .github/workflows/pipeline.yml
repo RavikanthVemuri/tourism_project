@@ -17,7 +17,7 @@ jobs:
           python-version: '3.9'
       - name: Install Dependencies
         run: |
-          pip install pandas huggingface_hub
+          pip install pandas huggingface_hub python-dotenv pyyaml
       - name: Register Data
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -35,7 +35,7 @@ jobs:
           python-version: '3.9'
       - name: Install Dependencies
         run: |
-          pip install pandas scikit-learn huggingface_hub numpy
+          pip install pandas scikit-learn huggingface_hub numpy python-dotenv pyyaml
       - name: Prepare Data
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
           python-version: '3.9'
       - name: Install Dependencies
         run: |
-          pip install pandas scikit-learn huggingface_hub joblib numpy
+          pip install pandas scikit-learn huggingface_hub joblib numpy python-dotenv pyyaml
       - name: Train Model
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -71,7 +71,7 @@ jobs:
           python-version: '3.9'
       - name: Install Dependencies
         run: |
-          pip install huggingface_hub
+          pip install huggingface_hub python-dotenv pyyaml
       - name: Deploy to Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
