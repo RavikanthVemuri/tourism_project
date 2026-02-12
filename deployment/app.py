@@ -45,7 +45,9 @@ def main():
     st.title("Tourism Package Purchase Prediction")
     st.write("Enter details to predict if a customer will purchase the package.")
     
+    print("Starting load_artifacts()...", flush=True)
     model, columns = load_artifacts()
+    print("Finished load_artifacts().", flush=True)
     
     if model and columns:
         with st.form("input_form"):
