@@ -41,6 +41,16 @@ def deploy_to_space():
             repo_type="space",
             token=hf_token
         )
+        
+        # Upload config.yaml explicitly
+        print("Uploading config.yaml...")
+        api.upload_file(
+            path_or_fileobj="config.yaml",
+            path_in_repo="config.yaml",
+            repo_id=SPACE_ID,
+            repo_type="space",
+            token=hf_token
+        )
         print("Deployment files uploaded. The Space should receive a rebuild trigger.")
         
     except Exception as e:
