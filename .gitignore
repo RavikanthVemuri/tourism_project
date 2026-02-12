@@ -1,6 +1,6 @@
 __pycache__/
 *.pkl
-*.csv
+# *.csv
 .env
 metrics.txt
 .DS_Store
