@@ -51,58 +51,89 @@ def main():
     
     if model and columns:
         with st.form("input_form"):
+            st.subheader("Customer Demographics")
             col1, col2 = st.columns(2)
             
             with col1:
                 age = st.number_input("Age", 18, 100, 30)
-                income = st.number_input("Monthly Income", 0, 100000, 20000)
-                pitch_score = st.slider("Pitch Satisfaction Score", 1, 5, 3)
+                gender = st.selectbox("Gender", ["Male", "Female"])
+                marital_status = st.selectbox("Marital Status", ["Single", "Married", "Divorced", "Unmarried"])
+                city_tier = st.selectbox("City Tier", [1, 2, 3])
                 
             with col2:
-                duration = st.number_input("Duration of Pitch (min)", 0, 120, 15)
-                followups = st.number_input("Number of Followups", 0, 10, 3)
-                trips = st.number_input("Number of Trips", 0, 20, 2)
+                monthly_income = st.number_input("Monthly Income", 0, 100000, 20000)
+                occupation = st.selectbox("Occupation", ["Salaried", "Small Business", "Large Business", "Free Lancer"])
+                passport = st.checkbox("Has Passport?")
+                own_car = st.checkbox("Owns Car?")
+                number_of_children = st.number_input("Number of Children Visiting", 0, 10, 0)
 
-            # Categorical inputs (simplified for demo)
-            # In a real app we'd map these to the one-hot columns
             st.markdown("---")
-            passport = st.checkbox("Has Passport?")
-            own_car = st.checkbox("Owns Car?")
+            st.subheader("Pitch Details")
+            col3, col4 = st.columns(2)
             
-            # Simple categorical dropdowns that we might not use directly but show intent
-            city_tier = st.selectbox("City Tier", [1, 2, 3])
+            with col3:
+                duration_of_pitch = st.number_input("Duration of Pitch (min)", 0, 120, 15)
+                number_of_followups = st.number_input("Number of Followups", 0, 10, 3)
+                product_pitched = st.selectbox("Product Pitched", ["Basic", "Standard", "Deluxe", "Super Deluxe", "King"])
+                pitch_satisfaction_score = st.slider("Pitch Satisfaction Score", 1, 5, 3)
             
+            with col4:
+                type_of_contact = st.selectbox("Type of Contact", ["Self Enquiry", "Company Invited"])
+                preferred_property_star = st.selectbox("Preferred Property Star", [3.0, 4.0, 5.0])
+                number_of_trips = st.number_input("Number of Trips", 0, 20, 2)
+                number_of_person_visiting = st.number_input("Number of Person Visiting", 1, 10, 2)
+                designation = st.selectbox("Designation", ["Executive", "Manager", "Senior Manager", "VP", "AVP"])
+
             submit = st.form_submit_button("Predict Probability")
             
             if submit:
                 # Construct dataframe with 0s for all columns
-                input_df = pd.DataFrame(columns=columns)
-                input_df.loc[0] = 0
+                input_df = pd.DataFrame(index=[0], columns=columns)
+                input_df = input_df.fillna(0) # Fill all with 0 initially
                 
-                # Fill known numericals directly (assuming names match regex logic or exact match)
-                # We need to map our inputs to the columns.
-                # Since we used pd.get_dummies, names are like 'Age', 'DurationOfPitch', etc.
+                # Digital mappings
+                input_df['Age'] = age
+                input_df['CityTier'] = city_tier
+                input_df['DurationOfPitch'] = duration_of_pitch
+                input_df['NumberOfPersonVisiting'] = number_of_person_visiting
+                input_df['NumberOfFollowups'] = number_of_followups
+                input_df['PreferredPropertyStar'] = preferred_property_star
+                input_df['NumberOfTrips'] = number_of_trips
+                input_df['Passport'] = int(passport)
+                input_df['PitchSatisfactionScore'] = pitch_satisfaction_score
+                input_df['OwnCar'] = int(own_car)
+                input_df['NumberOfChildrenVisiting'] = number_of_children
+                input_df['MonthlyIncome'] = monthly_income
                 
-                if 'Age' in columns: input_df['Age'] = age
-                if 'MonthlyIncome' in columns: input_df['MonthlyIncome'] = income
-                if 'PitchSatisfactionScore' in columns: input_df['PitchSatisfactionScore'] = pitch_score
-                if 'DurationOfPitch' in columns: input_df['DurationOfPitch'] = duration
-                if 'NumberOfFollowups' in columns: input_df['NumberOfFollowups'] = followups
-                if 'NumberOfTrips' in columns: input_df['NumberOfTrips'] = trips
-                if 'Passport' in columns: input_df['Passport'] = int(passport)
-                if 'OwnCar' in columns: input_df['OwnCar'] = int(own_car)
-                if 'CityTier' in columns: input_df['CityTier'] = city_tier
+                # One-hot mappings
+                # Helper function to set one-hot
+                def set_one_hot(col_prefix, value):
+                    col_name = f"{col_prefix}_{value}"
+                    if col_name in input_df.columns:
+                        input_df[col_name] = 1
                 
-                # For One-Hot features (e.g. Gender_Male), we can't easily map without more UI logic.
-                # We will just predict based on these main features for the MVP.
+                set_one_hot("TypeofContact", type_of_contact)
+                set_one_hot("Occupation", occupation)
+                set_one_hot("Gender", gender)
+                set_one_hot("ProductPitched", product_pitched)
+                set_one_hot("MaritalStatus", marital_status)
+                set_one_hot("Designation", designation)
                 
+                # Debug input
+                print("Input Data Row:\n", input_df.iloc[0][input_df.iloc[0] > 0], flush=True)
+
                 try:
                     prediction = model.predict(input_df)[0]
                     proba = model.predict_proba(input_df)[0][1]
                     
-                    st.success(f"Prediction: {'Will Purchase' if prediction == 1 else 'Will Not Purchase'}")
+                    st.markdown("---")
+                    if prediction == 1:
+                        st.success(f"**Prediction: Will Purchase**")
+                    else:
+                        st.error(f"**Prediction: Will Not Purchase**")
+                        
                     st.progress(float(proba))
-                    st.write(f"Probability of Purchase: {proba:.2%}")
+                    st.write(f"**Probability of Purchase:** {proba:.2%}")
                     
                 except Exception as e:
                     st.error(f"Prediction logic error: {e}")
